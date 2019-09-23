@@ -1,2 +1,2 @@
 # NYU-CS-GY-9163
-NYU Application Security Course
+NYU Application Security Course Assignment #1
