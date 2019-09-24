@@ -21,7 +21,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     bucket = hash_function(word);
     cursor = hashmap[bucket];
     while(cursor != NULL){
-        if(lower_case(word)==cursor->word){
+        if(word==cursor->word){
             return true;
         }
         cursor = cursor->next;
