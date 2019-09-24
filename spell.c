@@ -43,7 +43,7 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
         //printf("%s", line);
         hashmap_t new_node;
         new_node -> next = NULL;
-        new_node -> word = line;
+        strcpy(new_node -> word,line);
         int bucket = hash_function(line);
         if(hashtable[bucket]==NULL){
             hashtable[bucket] = new_node;
