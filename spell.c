@@ -63,7 +63,6 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
     size_t len = 0;
     ssize_t read;
     char delim[] = " ";
-    int ch = getc(fp);
     while ((read = getline(&line, &len, fp)) != -1) {
         char *ptr = strtok(line,delim);
         while(ptr !=NULL){
