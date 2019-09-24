@@ -7,11 +7,17 @@
 bool check_word(const char* word, hashmap_t hashtable[]){
     int bucket;
     int hash_function();
-    const char* lower_case();
+    char * varword = strdup(word);
+
     bucket = hash_function(word);
     struct node * hashmap[bucket];
     hashmap_t cursor;
     cursor = hashmap[bucket];
+    unsigned char *tptr = (unsigned char *)varword;
+    while(*tptr){
+        *tptr = tolower(*tptr);
+        tptr++;
+    }
     while(cursor != NULL){
         if(word == cursor -> word){
             return true;
@@ -21,7 +27,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     bucket = hash_function(word);
     cursor = hashmap[bucket];
     while(cursor != NULL){
-        if(word==cursor->word){
+        if(varword==cursor -> word){
             return true;
         }
         cursor = cursor->next;
