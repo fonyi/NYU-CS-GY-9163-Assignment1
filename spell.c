@@ -6,59 +6,68 @@
 
 bool check_word(const char* word, hashmap_t hashtable[]){
     int bucket;
-    int hash_function();
-    char * varword = strdup(word);
+    char varword[LENGTH+1];
+    for(int i=0; i<=strlen(word);i++){
+        varword[i]=tolower(word[i]);
+    }
 
-    bucket = hash_function(word);
-    struct node * hashmap[bucket];
-    hashmap_t cursor;
-    cursor = hashmap[bucket];
-    unsigned char *tptr = (unsigned char *)varword;
-    while(*tptr){
-        *tptr = tolower(*tptr);
-        tptr++;
-    }
+    bucket = hash_function(varword);
+    node *cursor = hashtable[bucket];
     while(cursor != NULL){
-        if(word == cursor -> word){
+        if(strcmp(word,cursor -> word)==true){
             return true;
         }
-        cursor = cursor->next;
-    }
-    bucket = hash_function(word);
-    cursor = hashmap[bucket];
-    while(cursor != NULL){
-        if(varword==cursor -> word){
-            return true;
+        else{
+            cursor = cursor->next;
         }
-        cursor = cursor->next;
     }
     return false;
 }
 
 bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
-    char *line = NULL;
+    
+    //initialize variables
+    char line[LENGTH];
     size_t len = 0;
     ssize_t read;
+    int bucket;
     FILE *fp = fopen(dictionary, "r");
     
-    hashmap_t new_node;
+    //initialize hash table
+    for(int i=0; i<=HASH_SIZE;i++){
+        hashtable[i]=NULL;
+    }
+    
+    //check for empty file
     if(fp == NULL) {
         perror("Unable to open file!");
         return false;
     }
-    while ((read = getline(&line, &len, fp)) != -1) {
+
+    while (fgets(line, LENGTH, fp)) {
         //printf("Retrieved line of length %zu:\n", read);
         //printf("%s", line);
-        
-        new_node -> next = NULL;
-        strcpy(new_node -> word,line);
-        int bucket = hash_function(line);
-        if(hashtable[bucket]==NULL){
-            hashtable[bucket] = new_node;
+        if(line[strlen(line)-1]=='\n'){
+            line[strlen(line)-1]='\0';
+        }
+
+        for(int i=0;i<=strlen(line);i++){
+            line[i]=tolower(line[i]);
+        }
+
+        bucket = hash_function(line);
+
+        if(hashtable[bucket] == NULL){
+            node *current = malloc(sizeof(node));
+            strncpy(current->word,line,LENGTH);
+            current->next = NULL;
+            hashtable[bucket] = current;
         }
         else{
-            new_node -> next = hashtable[bucket];
-            hashtable[bucket] = new_node;
+            node *current = malloc(sizeof(node));
+            strncpy(current->word,line,LENGTH);
+            current->next = hashtable[bucket];
+            hashtable[bucket] =current;
         }
     }
     fclose(fp);
@@ -66,30 +75,42 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
 }
 
 int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
+    //Check for empty file
+    if(fp == NULL) {
+    perror("Unable to open file!");
+    return false;
+    }
+    
     int num_misspelled = 0;
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
+    char len[100000];
+    char *line = strtok(len," ");
     char delim[] = " ";
-    while ((read = getline(&line, &len, fp)) != -1) {
-        char *ptr = strtok(line,delim);
-        while(ptr !=NULL){
-            size_t pos = 0;
-            for (char *p = ptr;*p;++p){
-                if (isalpha(*p)){
-                    ptr[pos++] = *p;
+    while (fgets(len,100000,fp)) {
+        line = strtok(NULL," ");
+        while(line !=NULL){
+            if(line[strlen(line)-1]=='\n'){
+                line[strlen(line)-1]='\0';
+            }
+            line[strlen(line)]='\0';
+            char *clean;
+            for(;*line;++line){
+                if (!ispunct((unsigned char) *line)){
+                    *clean++ = tolower((unsigned char) *line);
                 }
-            ptr[pos] = '\0';
-            if(!check_word(ptr,hashtable)){
-                char **ptr_ptr =&ptr;
-                misspelled = ptr_ptr;
+            }
+            *clean = 0;
+            printf("Cleaned: %s\n",clean);
+            bool checkword;
+            checkword = check_word(clean, hashtable);
+            if(!(checkword == false)){
+                misspelled[num_misspelled] = malloc(strlen(clean));
+                strcpy(misspelled[num_misspelled],clean);
                 num_misspelled++;
             }
-            }
-            ptr = strtok(NULL, delim);
+            line = strtok(NULL, " ");
         }
 
     }
-    
+    printf("check_words found %i misspelled words\n",num_misspelled);
     return num_misspelled;
 }
