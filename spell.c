@@ -40,6 +40,8 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
     size_t len = 0;
     ssize_t read;
     FILE *fp = fopen(dictionary, "r");
+    
+    hashmap_t new_node;
     if(fp == NULL) {
         perror("Unable to open file!");
         return false;
@@ -47,7 +49,7 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
     while ((read = getline(&line, &len, fp)) != -1) {
         //printf("Retrieved line of length %zu:\n", read);
         //printf("%s", line);
-        hashmap_t new_node;
+        
         new_node -> next = NULL;
         strcpy(new_node -> word,line);
         int bucket = hash_function(line);
