@@ -8,17 +8,18 @@
 bool check_word(const char* word, hashmap_t hashtable[]){
     int bucket;
     char varword[LENGTH+1];
-
+    printf("raw word: %s \n",word);
     for(int i=0; i<=strlen(word);i++){
-        varword[i]=tolower(word[i]);
-        
+        if (!ispunct(word[i])){
+            varword[i]=tolower(word[i]);
+        }   
     }
-    printf("varword: [%s]\n",varword);
+    printf("check word: %s \n",varword);
     bucket = hash_function(varword);
     node *cursor = hashtable[bucket];
     while(cursor != NULL){
-        printf("[%s][%s]",word,cursor->word);
-        if(strcmp(word,cursor -> word)==true){
+        //printf("Word:%s Cursor:%s",word,cursor->word);
+        if(strcmp(varword,cursor -> word)==true){
             return true;
         }
         else{
@@ -88,30 +89,38 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
     perror("Unable to open file!");
     return false;
     }
-    
+    for(int i=0; i < MAX_MISSPELLED; i++){
+        misspelled[i] = NULL;
+    }
 
     while (fgets(len,100000,fp)) {
         printf("Line: %s\n",len);
-        printf("Word: %s\n",line);
-        line = strtok(NULL," ");
+        line = strtok(len," ");
+        //printf("Word: %s\n",line);
+        //line = strtok(NULL," ");
         while(line !=NULL){
+            //printf("in while %s",line);
+            /*
             if(line[strlen(line)-1]=='\n'){
                 line[strlen(line)-1]='\0';
+                printf("%s",line);
             }
             line[strlen(line)]='\0';
             char *clean = 0;
             for(;*line;++line){
-                if (!ispunct((unsigned char) *line)){
-                    *clean++ = tolower((unsigned char) *line);
+                if (isalpha((unsigned char) *line)){
+                    *clean++ = *line;
+                    printf("clean: %s",clean);
                 }
             }
+            */
             //*clean = 0;
-            printf("Cleaned: %s\n",clean);
+            //printf("Cleaned: %s\n",clean);
             bool checkword;
-            checkword = check_word(clean, hashtable);
+            checkword = check_word(line, hashtable);
             if(!(checkword == false)){
-                misspelled[num_misspelled] = malloc(strlen(clean));
-                strcpy(misspelled[num_misspelled],clean);
+                misspelled[num_misspelled] = malloc(strlen(line));
+                strcpy(misspelled[num_misspelled],line);
                 num_misspelled++;
             }
             line = strtok(NULL, " ");
