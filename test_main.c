@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define DICTIONARY "wordlist.txt"
-#define TESTDICT "test_worlist.txt"
+#define TESTDICT "test_wordlist.txt"
 
 START_TEST(test_dictionary_normal)
 {

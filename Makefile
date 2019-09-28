@@ -23,8 +23,11 @@ test: dictionary.o spell.o test_main.o
 prog: dictionary.o spell.o main.o
 	gcc -Wall -o spell_check dictionary.o spell.o main.o
 
+cleantest:
+	rm test_main test_main.o spell.o dictionary.o dictionary.h.gch
+
 clean:
-	rm dictionary.o spell.o main.o
+	rm dictionary.o spell.o main.o dictionary.h.gch
 
 cleanall:clean
 	rm spell_check
