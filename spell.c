@@ -7,6 +7,7 @@
 
 bool check_word(const char* word, hashmap_t hashtable[]){
     int bucket;
+    hashmap_t cursor = NULL;
     int word_size = strnlen(word,LENGTH);
     char varword[word_size];
     //printf("raw word: %s \n",word);
@@ -21,7 +22,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
    
     //printf("check word: %s \n",varword);
     bucket = hash_function(varword);
-    node* cursor = hashtable[bucket];
+    cursor = hashtable[bucket];
     //bool test = (cursor == NULL);
     //printf("test %d\n",test);
     //printf("bucket %d\n",bucket);
