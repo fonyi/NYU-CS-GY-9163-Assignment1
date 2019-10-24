@@ -164,8 +164,12 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
         
         line[strcspn(line,"\n")] = '\0';
         item = strtok(line, " ");
-	    
+	int track = 0;    
         while(item !=NULL){
+	    //if we have more words than max misspelled, that can cause an issue if they are all misspelled...
+	    if (track > MAX_MISSPELLED){
+	    	return false;
+	    }
             /*
             if(line[strlen(line)-1]=='\n'){
                 line[strlen(line)-1]='\0';
@@ -191,6 +195,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
                 num_misspelled++;
             }
             item = strtok(NULL, " ");
+	    track++;
         }
 	free(line);
     }
