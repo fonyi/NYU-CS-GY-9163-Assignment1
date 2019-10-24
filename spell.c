@@ -45,7 +45,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
         memcpy(varword, &varword[1], word_size -1);
     }
     
-    printf("check word: %s \n",varword);
+    //printf("check word: %s \n",varword);
     bucket = hash_function(varword);
     cursor = hashtable[bucket];
     //bool test = (cursor == NULL);
@@ -193,7 +193,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
 		item_len = strlen(item);
                 strncpy(misspelled[num_misspelled],item, item_len+1);
                 num_misspelled++;
-		printf("misspelled: %s \n",item);
+		//printf("misspelled: %s \n",item);
 		//return false if we exceed max misspelled
 		if(num_misspelled > MAX_MISSPELLED){
 		    exit(0);
