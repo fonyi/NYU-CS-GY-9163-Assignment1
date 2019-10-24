@@ -45,7 +45,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
         memcpy(varword, &varword[1], word_size -1);
     }
     
-    //printf("check word: %s \n",varword);
+    printf("check word: %s \n",varword);
     bucket = hash_function(varword);
     cursor = hashtable[bucket];
     //bool test = (cursor == NULL);
