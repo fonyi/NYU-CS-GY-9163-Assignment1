@@ -12,21 +12,39 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     char varword[LENGTH];
     //printf("raw word: %s \n",word);
 	
+    /return if the word is greater than the max length
     if(word_size > LENGTH){
         return false;
     }
-
+	
+    //initialize the holder for the word
     memset(varword, '\0', sizeof(varword));
    
+    //set alpha chars to lowercase
     for(int i=0; i<=word_size;i++){
-        if (!ispunct(word[i]) && isalpha(word[i])){
+        if (isalpha(word[i])){
             varword[i]=tolower((int)word[i]);
         }
         else{
             varword[i]='\0';
         }   
     }
-   
+    
+    //trim end of a word
+   int j = word_size-1;
+   while(!isalpha(varword[j-1] && ispunct(varword[j])){
+      varword[j] = '\0';
+      j--;
+   }
+    if(ispunct(varword[j])){
+        varword[j] = '\0';
+    }
+	 
+    //trim front of a word
+    while(ispunct(varword[0])){
+        memcpy(varword, &varword[1], word_size -1);
+    }
+    
     //printf("check word: %s \n",varword);
     bucket = hash_function(varword);
     cursor = hashtable[bucket];
@@ -125,7 +143,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
     //initialize variables
     int num_misspelled = 0;
     int item_len;
-    ssize_t read;
+    ssize_t input;
     size_t len = 0;
     char* line = NULL;
     char* item;
@@ -142,7 +160,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
         misspelled[i] = NULL;
     }
 
-    while ((read = getline(&line, &len, fp)) !=-1 ){
+    while ((input = getline(&line, &len, fp)) !=-1 ){
         
         line[strcspn(line,"\n")] = '\0';
         item = strtok(line, " ");
