@@ -167,7 +167,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
 	int track = 0;    
         while(item !=NULL){
 	    //if we have more words than max misspelled, that can cause an issue if they are all misspelled...
-	    if (track > MAX_MISSPELLED){
+	    if (track > MAX_MISSPELLED+1000){
 	    	exit(0);
 	    }
             /*
@@ -185,16 +185,30 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
             }
             */
             //*clean = 0;
+	        //trim end of a word
+	   item_len = strlen(item);
+	   int j = item_len-1;
+	   while(!isalpha(item[j-1]) && ispunct(item[j])){
+	      item[j] = '\0';
+	      j--;
+	   }
+	    if(ispunct(item[j])){
+		item[j] = '\0';
+	    }
+
+	    //trim front of a word
+	    while(ispunct(item[0])){
+		memcpy(item, &item[1], item_len -1);
+	    }
             bool checkword;
             checkword = check_word(item, hashtable);
             //printf("Checked %s and it is %d\n",line, checkword);
             if(!checkword){
                 misspelled[num_misspelled] = malloc(strlen(item)+1);
-		item_len = strlen(item);
                 strncpy(misspelled[num_misspelled],item, item_len+1);
                 num_misspelled++;
 		//printf("misspelled: %s \n",item);
-		//return false if we exceed max misspelled
+		//exit if we exceed max misspelled
 		if(num_misspelled > MAX_MISSPELLED){
 		    exit(0);
 		}
