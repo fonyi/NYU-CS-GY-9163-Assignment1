@@ -200,6 +200,16 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
 	    while(ispunct(item[0])){
 		memcpy(item, &item[1], item_len -1);
 	    }
+	    
+            //set alpha chars to lowercase
+	    for(int i=0; i<=item_len;i++){
+		if (isalpha(item[i])){
+		    item[i]=tolower((int)item[i]);
+		}
+		else{
+		    item[i]='\0';
+		}   
+	    }
             bool checkword;
             checkword = check_word(item, hashtable);
             //printf("Checked %s and it is %d\n",line, checkword);
