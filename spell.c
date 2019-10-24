@@ -193,7 +193,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
 		item_len = strlen(item);
                 strncpy(misspelled[num_misspelled],item, item_len+1);
                 num_misspelled++;
-		printf("misspelled: %s",item);
+		printf("misspelled: %s \n",item);
 		//return false if we exceed max misspelled
 		if(num_misspelled > MAX_MISSPELLED){
 		    exit(0);
