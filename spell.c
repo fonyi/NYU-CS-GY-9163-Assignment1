@@ -8,12 +8,19 @@
 bool check_word(const char* word, hashmap_t hashtable[]){
     int bucket;
     hashmap_t cursor = NULL;
-    int word_size = strnlen(word,LENGTH);
-    char varword[word_size];
+    int word_size = strlen(word);
+    char varword[LENGTH];
     //printf("raw word: %s \n",word);
+	
+    if(word_size > LENGTH){
+        return false;
+    }
+
+    memset(varword, '\0', sizeof(varword));
+   
     for(int i=0; i<=word_size;i++){
-        if (!ispunct((unsigned char)word[i])){
-            varword[i]=tolower(word[i]);
+        if (!ispunct(word[i]) && isalpha(word[i])){
+            varword[i]=tolower((int)word[i]);
         }
         else{
             varword[i]='\0';
@@ -30,15 +37,14 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     while(cursor){
         //printf("in the loop!\n");
         
-        if(strncmp(varword,cursor -> word,LENGTH+1)==0){
+        if(strcmp(varword,cursor -> word)==0){
             //printf("Valid word! %s and %s\n",varword,cursor->word);
             return true;
             
         }
         else{
             //printf("Invalid word! %s and %s\n",varword,cursor->word);
-            cursor = cursor->next;
-            
+            cursor = cursor->next;  
         }
     }
     return false;
@@ -47,17 +53,21 @@ bool check_word(const char* word, hashmap_t hashtable[]){
 bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
     
     //initialize variables
-    char line[LENGTH];
+    char line[LENGTH+1];
     int bucket=0;
-    FILE *fp = fopen(dictionary, "r");
+    hashmap_t current = NULL;
+    
+    //initialize line buffer
+    memset(line, '\0', sizeof(line));
    
-    node* current = malloc(100000*sizeof(node));
-    current->next = NULL;
+    
+    //current->next = NULL;
     //initialize hash table
     for(int i=0; i<=HASH_SIZE;i++){
         hashtable[i]=NULL;
     }
-    
+	
+    FILE *fp = fopen(dictionary, "r");
     //check for empty file
     if(fp == NULL) {
         perror("Unable to open file!");
@@ -65,9 +75,10 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
         return false;
     }
 
-    while (fgets(line, LENGTH, fp) != NULL) {
-
-        //printf("dict: %s", line);
+    while (fgets(line, LENGTH+1, fp) != NULL) {
+	sscanf(line,"%s",line);
+        
+	//printf("dict: %s", line);
         /* 
         if(line[strlen(line)-1]=='\n'){
             line[strlen(line)-1]='\0';
@@ -77,22 +88,34 @@ bool load_dictionary(const char* dictionary, hashmap_t hashtable[]){
             line[i]=tolower(line[i]);
         }
         */
-        line[strcspn(line,"\n")]=0;
-        bucket = hash_function(line);
-        strncpy(current->word,line,LENGTH+1);
+	current = malloc(sizeof(struct node));
+	    
+        //line[strcspn(line,"\n")]=0;
+        
+        //strncpy(current->word,line,LENGTH+1);
         //printf("%s: %s %s: %d\n"," Loaded word",current->word,"bucket",bucket);
-        if(hashtable[bucket] == NULL){
-            hashtable[bucket] = current;
-        }
-        else{
-            current->next = hashtable[bucket];
-            hashtable[bucket] =current;
-        }
-        current = malloc(sizeof(node));
-        current -> next = NULL;
+	if(current != NULL){
+	    current -> next = NULL;
+	    memset(current -> word, '\0', LENGTH+1);
+	    strncpy(current -> word, line, strlen(line));
+	    
+	    bucket = hash_function(line);
+	
+            if(hashtable[bucket] == NULL){
+                hashtable[bucket] = current;
+            }
+            else{
+                current->next = hashtable[bucket];
+                hashtable[bucket] =current;
+            }
+	}
+	else{
+	    return false;
+	}
+        memset(line, '\0', sizeof(line));
 	
     }
-    free(current);
+
     fclose(fp);
     return true;
 }
@@ -101,8 +124,11 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
     
     //initialize variables
     int num_misspelled = 0;
-    char len[500000];
-    char* line;
+    int item_len;
+    ssize_t read;
+    size_t len = 0;
+    char* line = NULL;
+    char* item;
     //line = strtok(len," ");
     
     //Check for empty file
@@ -111,15 +137,17 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
     fclose(fp);
     return false;
     }
+	
     for(int i=0; i < MAX_MISSPELLED; i++){
         misspelled[i] = NULL;
     }
 
-    while (fgets(len,100000,fp)) {
+    while (read = getline(&line, &len, fp)) !=-1 ){
         
-        line = strtok(len," ");
-        //line = strtok(NULL," ");
-        while(line !=NULL){
+        line[strcspn(line,"\n")] = '\0';
+        item = strtok(line, " ");
+	    
+        while(item !=NULL){
             /*
             if(line[strlen(line)-1]=='\n'){
                 line[strlen(line)-1]='\0';
@@ -136,19 +164,17 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
             */
             //*clean = 0;
             bool checkword;
-            checkword = check_word(line, hashtable);
+            checkword = check_word(item, hashtable);
             //printf("Checked %s and it is %d\n",line, checkword);
             if(!checkword){
-                misspelled[num_misspelled] = malloc(sizeof(char)*strlen(line)+1);
-                strcpy(misspelled[num_misspelled],line);
+                misspelled[num_misspelled] = malloc(strlen(item)+1);
+		item_len = strlen(item);
+                strncpy(misspelled[num_misspelled],item, item_len+1);
                 num_misspelled++;
- 		free(misspelled[num_misspelled]);
             }
-            line = strtok(NULL, " ");
-	    free(misspelled[num_misspelled]);
-            
+            item = strtok(NULL, " ");
         }
-
+	free(line);
     }
     //printf("check_words found %i misspelled words\n",num_misspelled);
     //fclose(fp);
