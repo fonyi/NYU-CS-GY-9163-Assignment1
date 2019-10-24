@@ -12,7 +12,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     char varword[LENGTH];
     //printf("raw word: %s \n",word);
 	
-    /return if the word is greater than the max length
+    //return if the word is greater than the max length
     if(word_size > LENGTH){
         return false;
     }
@@ -32,7 +32,7 @@ bool check_word(const char* word, hashmap_t hashtable[]){
     
     //trim end of a word
    int j = word_size-1;
-   while(!isalpha(varword[j-1] && ispunct(varword[j])){
+   while(!isalpha(varword[j-1]) && ispunct(varword[j])){
       varword[j] = '\0';
       j--;
    }
