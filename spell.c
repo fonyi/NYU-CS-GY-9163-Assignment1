@@ -142,7 +142,7 @@ int check_words(FILE *fp, hashmap_t hashtable[], char* misspelled[]){
         misspelled[i] = NULL;
     }
 
-    while (read = getline(&line, &len, fp)) !=-1 ){
+    while ((read = getline(&line, &len, fp)) !=-1 ){
         
         line[strcspn(line,"\n")] = '\0';
         item = strtok(line, " ");
